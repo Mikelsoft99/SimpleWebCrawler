@@ -145,9 +145,12 @@ namespace SiteCrawler
             {
                 Console.WriteLine("Crawl OK: {0}", page.Uri.ToString());
                 Console.WriteLine();
-                AddToCrawledPages(page.Uri.ToString());
+                string currentURL = page.Uri.ToString();
+                AddToCrawledPages(currentURL);
 
                 if(ExtractLinks) {
+
+
                     AngleSharp.Dom.Html.IHtmlDocument htmlPage = page.AngleSharpHtmlDocument;
                     // get all Links in class selector
                     // generate selector
@@ -167,14 +170,30 @@ namespace SiteCrawler
                     {
                         if (x.HasAttribute("href"))
                         {
-                            return x.Attributes["href"].Value;
+                            string linkValue = x.Attributes["href"].Value;
+
+                            // dismiss non valid values
+                            if (linkValue.Contains("javascript:")) return null;
+                            if (linkValue.Contains("mailto:")) return null;
+                            if (linkValue.Contains("tel:")) return null;
+
+                            // base uri
+                            string baseUri = page.Uri.GetLeftPart(UriPartial.Authority);
+
+                            if (!linkValue.StartsWith("http"))
+                            {
+                                linkValue = baseUri+"/"+linkValue;
+                            }
+                            return linkValue;
                         }
                         return null;
                     }
-                    ).ToList();
+                    )
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .ToList();
 
                     // store in dictionary
-                    this.PagesCrawledLinks.Add(page.Uri.ToString(), linksFound);
+                    this.PagesCrawledLinks.Add(currentURL, linksFound);
                 }
             }
 

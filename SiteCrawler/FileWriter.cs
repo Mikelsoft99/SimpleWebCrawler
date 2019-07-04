@@ -21,7 +21,15 @@ namespace SiteCrawler
             string basePath = System.Environment.CurrentDirectory;
             string path = System.IO.Path.Combine(basePath, filename.Replace(".", ".links."));
 
-            foreach(KeyValuePair<string, List<string>> item in data)
+            // add headers
+            List<string> headers = new List<string>()
+            {
+                "Source;LINKS"
+            };
+            System.IO.File.AppendAllLines(path, headers);
+
+            // write dictionary to file
+            foreach (KeyValuePair<string, List<string>> item in data)
             {
                 List<string> linesToWrite = item.Value.Select(x => string.Format("{0};{1}", item.Key, x))
                     .ToList();
