@@ -11,10 +11,14 @@ namespace SiteCrawler
     class CrawlerLogic
     {
         public string BaseDomain;
+        public bool ExtractLinks {get; set;}
+        public string ClassSelector { get; set; }
 
         protected List<string> PagesToCrawl = new List<string>();
         public List<string> PagesCraweled = new List<string>();
+        public Dictionary<string, List<string>> PagesCrawledLinks = new Dictionary<string, List<string>>();
         protected List<string> PagesFailed = new List<string>();
+        
 
         protected PoliteWebCrawler Crawler;
         protected FileWriter FileWriter;
@@ -31,6 +35,24 @@ namespace SiteCrawler
             AddToPagesToCrawl(BaseUrl);
             SetBaseDomain(PagesToCrawl.First());
 
+        }
+
+        /// <summary>
+        /// define the option for extracing the links too
+        /// </summary>
+        /// <param name="s"></param>
+        public void SetOptionExtractLink(string s) {
+            ExtractLinks =  s == "y" ? true : false;
+        }
+
+        /// <summary>
+        /// Set the class selector for extracting links only form that element
+        /// example .className
+        /// </summary>
+        /// <param name="c"></param>
+        public void SetOptionClassSelector(string c)
+        {
+            ClassSelector = c;
         }
 
         private void SetBaseDomain(string url)
@@ -124,6 +146,36 @@ namespace SiteCrawler
                 Console.WriteLine("Crawl OK: {0}", page.Uri.ToString());
                 Console.WriteLine();
                 AddToCrawledPages(page.Uri.ToString());
+
+                if(ExtractLinks) {
+                    AngleSharp.Dom.Html.IHtmlDocument htmlPage = page.AngleSharpHtmlDocument;
+                    // get all Links in class selector
+                    // generate selector
+
+                    // add prefix if it is set
+                    string selector = "a";
+                    if (!String.IsNullOrWhiteSpace(ClassSelector))
+                    {
+                        selector = ClassSelector + " " + selector;
+                    }
+
+                    // all links
+                    AngleSharp.Dom.IHtmlCollection<AngleSharp.Dom.IElement> links = htmlPage.QuerySelectorAll(selector);
+
+                    // extract links
+                    List<string> linksFound = links.Select((x) =>
+                    {
+                        if (x.HasAttribute("href"))
+                        {
+                            return x.Attributes["href"].Value;
+                        }
+                        return null;
+                    }
+                    ).ToList();
+
+                    // store in dictionary
+                    this.PagesCrawledLinks.Add(page.Uri.ToString(), linksFound);
+                }
             }
 
         }

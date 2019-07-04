@@ -16,6 +16,19 @@ namespace SiteCrawler
             System.IO.File.AppendAllLines(path, data);
         }
 
+        public void WriteToFile(string filename, Dictionary<string,List<string>> data)
+        {
+            string basePath = System.Environment.CurrentDirectory;
+            string path = System.IO.Path.Combine(basePath, filename.Replace(".", ".links."));
+
+            foreach(KeyValuePair<string, List<string>> item in data)
+            {
+                List<string> linesToWrite = item.Value.Select(x => string.Format("{0};{1}", item.Key, x))
+                    .ToList();
+                System.IO.File.AppendAllLines(path, linesToWrite);
+            }
+        }
+
         public List<string> LoadFileLines(string filename)
         {
             string basePath = System.Environment.CurrentDirectory;
