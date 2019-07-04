@@ -145,7 +145,8 @@ namespace SiteCrawler
             {
                 Console.WriteLine("Crawl OK: {0}", page.Uri.ToString());
                 Console.WriteLine();
-                AddToCrawledPages(page.Uri.ToString());
+                string currentURL = page.Uri.ToString();
+                AddToCrawledPages(currentURL);
 
                 if(ExtractLinks) {
                     AngleSharp.Dom.Html.IHtmlDocument htmlPage = page.AngleSharpHtmlDocument;
@@ -167,14 +168,19 @@ namespace SiteCrawler
                     {
                         if (x.HasAttribute("href"))
                         {
-                            return x.Attributes["href"].Value;
+                            string linkValue = x.Attributes["href"].Value;
+                            if(!linkValue.StartsWith(currentURL))
+                            {
+                                linkValue = currentURL + linkValue;
+                            }
+                            return linkValue;
                         }
                         return null;
                     }
                     ).ToList();
 
                     // store in dictionary
-                    this.PagesCrawledLinks.Add(page.Uri.ToString(), linksFound);
+                    this.PagesCrawledLinks.Add(currentURL, linksFound);
                 }
             }
 
