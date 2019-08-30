@@ -24,17 +24,23 @@ namespace SiteCrawler
 
             Console.WriteLine();
 
+            // input domains
             Console.WriteLine("> Input Domain(s) or file:");
             string domain = Console.ReadLine();
             Console.WriteLine();
 
+            // check for meta data
+            Console.WriteLine("> Include meta data like tile, keywords etc. (Y/N)");
+            string includeMetaData = Console.ReadKey().Key.ToString().ToLower();
+            Console.WriteLine();
 
+            // check for extract all links on pages
             Console.WriteLine("> Extract Links from pages? (Y/N)");
             string extractLinks = Console.ReadKey().Key.ToString().ToLower();
             Console.WriteLine();
 
             string classSelector = null;
-            if(extractLinks == "y")
+            if (extractLinks == "y")
             {
                 Console.WriteLine("Would you take the links only from a single div in the DOM?");
                 Console.WriteLine("Leave empty if not!");
@@ -50,10 +56,12 @@ namespace SiteCrawler
 
             CrawlerLogic logic = new CrawlerLogic(domain);
 
-            // check if we have to extract links from the page
-            if(extractLinks == "y" || extractLinks == "n") {
+            // some options to set
+            if (!string.IsNullOrEmpty(extractLinks) || string.IsNullOrEmpty(includeMetaData))
+            {
                 logic.SetOptionExtractLink(extractLinks);
                 logic.SetOptionClassSelector(classSelector);
+                logic.SetOptionIncludeMetaData(includeMetaData);
             }
 
 
@@ -65,16 +73,26 @@ namespace SiteCrawler
 
             FileWriter fileWriter = new FileWriter();
             fileWriter.WriteToFile(
-                filename, 
+                filename,
                 logic.PagesCraweled.OrderBy(x => x).ToList()
             );
 
             // write dictionary to disk too
-            if(logic.ExtractLinks)
+            if (logic.ExtractLinks)
             {
-                fileWriter.WriteToFile(
-                    filename,
-                    logic.PagesCrawledLinks);
+                if (logic.IncludeMetaData)
+                {
+                    fileWriter.WriteToFile(
+                        filename,
+                        logic.MetaData);
+                }
+                else
+                {
+                    fileWriter.WriteToFile(
+                        filename,
+                        logic.PagesCrawledLinks);
+                }
+
             }
 
             Console.WriteLine("--- END ---");

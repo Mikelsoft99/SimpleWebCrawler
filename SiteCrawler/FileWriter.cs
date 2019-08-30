@@ -16,7 +16,7 @@ namespace SiteCrawler
             System.IO.File.AppendAllLines(path, data);
         }
 
-        public void WriteToFile(string filename, Dictionary<string,List<string>> data)
+        public void WriteToFile(string filename, Dictionary<string, List<string>> data)
         {
             string basePath = System.Environment.CurrentDirectory;
             string path = System.IO.Path.Combine(basePath, filename.Replace(".", ".links."));
@@ -35,6 +35,24 @@ namespace SiteCrawler
                     .ToList();
                 System.IO.File.AppendAllLines(path, linesToWrite);
             }
+        }
+
+        public void WriteToFile(string filename, List<Models.MetaData> metas)
+        {
+            string basePath = System.Environment.CurrentDirectory;
+            string path = System.IO.Path.Combine(basePath, filename.Replace(".", ".metas."));
+
+            // add headers
+            List<string> headers = new List<string>()
+            {
+                "Source;Title;Description;Keywords"
+            };
+            System.IO.File.AppendAllLines(path, headers);
+
+            // write dictionary to file
+            List<string> linesToWrite = metas.Select(x => string.Format("{0};{1};{2};{3}", x.Url, x.Title, x.Description, x.Keywords))
+                .ToList();
+            System.IO.File.AppendAllLines(path, linesToWrite);
         }
 
         public List<string> LoadFileLines(string filename)

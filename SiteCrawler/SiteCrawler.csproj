@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="CrawlerLogic.cs" />
     <Compile Include="FileWriter.cs" />
+    <Compile Include="Models\MetaData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
