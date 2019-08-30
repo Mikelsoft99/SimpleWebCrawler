@@ -72,26 +72,28 @@ namespace SiteCrawler
             Console.WriteLine();
 
             FileWriter fileWriter = new FileWriter();
-            fileWriter.WriteToFile(
-                filename,
-                logic.PagesCraweled.OrderBy(x => x).ToList()
+            if (logic.IncludeMetaData)
+            {
+                fileWriter.WriteToFile(
+                        filename,
+                        logic.MetaData.OrderBy(x => x.DeepLevel).ThenBy(x => x.Url).ToList());
+            }
+            else
+            {
+                fileWriter.WriteToFile(
+                    filename,
+                    logic.PagesCraweled.OrderBy(x => x).ToList()
             );
+            }
+
 
             // write dictionary to disk too
             if (logic.ExtractLinks)
             {
-                if (logic.IncludeMetaData)
-                {
-                    fileWriter.WriteToFile(
-                        filename,
-                        logic.MetaData);
-                }
-                else
-                {
-                    fileWriter.WriteToFile(
-                        filename,
-                        logic.PagesCrawledLinks);
-                }
+
+                fileWriter.WriteToFile(
+                    filename,
+                    logic.PagesCrawledLinks);
 
             }
 

@@ -12,5 +12,20 @@ namespace SiteCrawler.Models
         public string Description { get; set; }
         public string Keywords { get; set; }
         public string Url { get; set; }
+
+        public int DeepLevel
+        {
+            get
+            {
+                if(!string.IsNullOrEmpty(Title))
+                {
+                    return Title.ToCharArray().Count(x => x == '/');
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
     }
 }
